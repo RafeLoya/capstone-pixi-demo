@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite } from 'pixi.js';
+import { Application, Assets, Container, Sprite } from './node_modules/pixi.js/dist/pixi.mjs';
 
 (async () => {
   // Create a new application
