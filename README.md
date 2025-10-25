@@ -1,4 +1,4 @@
-# Quiz Game Prototype
+# Quiz Prototype
 
 A multiplayer quiz game built with Pixi.js and Socket.io.
 

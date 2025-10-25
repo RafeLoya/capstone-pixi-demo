@@ -15,11 +15,14 @@ export class ResultScene {
     const screenHeight = this.app.screen.height;
 
     // Title
-    const title = new Text('Game Over!', {
-      fontSize: 48,
-      fill: '#ffffff',
-      fontWeight: 'bold'
-    });
+    const title = new Text({
+      text: 'Game Over!',
+      style: {
+        fontSize: 48,
+        fill: '#ffffff',
+        fontWeight: 'bold'
+      }
+    })
     title.anchor.set(0.5);
     title.x = screenWidth / 2;
     title.y = 100;
@@ -34,14 +37,14 @@ export class ResultScene {
       const isCurrentPlayer = pid === this.playerId;
       const rank = index + 1;
       
-      const scoreText = new Text(
-        `${rank}. ${isCurrentPlayer ? 'YOU' : `Player ${pid.slice(0, 6)}`}: ${score} pts`,
-        {
+      const scoreText = new Text({
+        text: `${rank}. ${isCurrentPlayer ? 'YOU' : `Player ${pid.slice(0, 6)}`}: ${score} pts`,
+        style: {
           fontSize: 28,
           fill: isCurrentPlayer ? '#f39c12' : '#ffffff',
           fontWeight: isCurrentPlayer ? 'bold' : 'normal'
         }
-      );
+      })
       scoreText.anchor.set(0.5);
       scoreText.x = screenWidth / 2;
       scoreText.y = yPos;

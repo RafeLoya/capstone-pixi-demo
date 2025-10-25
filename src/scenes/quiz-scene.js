@@ -29,13 +29,6 @@ export class QuizScene {
         align: 'center'
       }
     });
-    // const questionText = new Text(this.questionData.question, {
-    //   fontSize: 28,
-    //   fill: '#ffffff',
-    //   wordWrap: true,
-    //   wordWrapWidth: screenWidth - 100,
-    //   align: 'center'
-    // });
     questionText.anchor.set(0.5, 0);
     questionText.x = screenWidth / 2;
     questionText.y = 50;
@@ -102,10 +95,6 @@ export class QuizScene {
         fill: '#ffffff'
       }
     });
-    // const scoreText = new Text(`Score: ${results.scores[results.playerId]} (+${results.pointsEarned || 0})`, {
-    //   fontSize: 24,
-    //   fill: '#ffffff'
-    // });
     scoreText.x = 20;
     scoreText.y = 20;
     this.container.addChild(scoreText);

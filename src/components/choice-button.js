@@ -23,12 +23,6 @@ export class ChoiceButton {
         wordWrapWidth: width - 20
       }
     })
-    // this.label = new Text(text, {
-    //   fontSize: 20,
-    //   fill: '#ffffff',
-    //   wordWrap: true,
-    //   wordWrapWidth: width - 20
-    // });
     this.label.anchor.set(0.5);
     this.label.x = width / 2;
     this.label.y = height / 2;
