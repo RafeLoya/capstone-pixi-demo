@@ -18,7 +18,7 @@ export class QuizScene {
     const screenWidth = this.app.screen.width;
     const screenHeight = this.app.screen.height;
 
-    // Question text
+    // question text
     const questionText = new Text({
       text: this.questionData.question,
       style: {
@@ -34,7 +34,7 @@ export class QuizScene {
     questionText.y = 50;
     this.container.addChild(questionText);
 
-    // Answer buttons
+    // answer buttons
     const buttonWidth = 400;
     const buttonHeight = 80;
     const startY = 200;
@@ -56,26 +56,26 @@ export class QuizScene {
   }
 
   selectAnswer(choiceIndex) {
-    if (this.selectedChoice !== null) return; // Already answered
+    if (this.selectedChoice !== null) return; // already answered
 
     this.selectedChoice = choiceIndex;
     this.buttons[choiceIndex].select();
     
-    // Disable all buttons
+    // disable all buttons
     this.buttons.forEach(btn => btn.disable());
 
-    // Send to server
+    // send to server
     this.onAnswerCallback(choiceIndex);
   }
 
   onPlayerAnswered(data) {
-    // Show indicator that another player answered
-    // For now, just log it
+    // show indicator that another player answered
+    // for now, just logging it
     console.log(`Player ${data.playerId} answered`);
   }
 
   showResults(results) {
-    // Show correct answer
+    // show correct answer
     const correctIndex = this.questionData.correctAnswer;
     
     this.buttons.forEach((button, index) => {
@@ -87,7 +87,7 @@ export class QuizScene {
       button.disable();
     });
 
-    // Show score update
+    // show score update
     const scoreText = new Text({
       text: `Score: ${results.scores[results.playerId]} (+${results.pointsEarned || 0})`,
       style: {

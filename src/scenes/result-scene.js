@@ -14,7 +14,7 @@ export class ResultScene {
     const screenWidth = this.app.screen.width;
     const screenHeight = this.app.screen.height;
 
-    // Title
+    // title
     const title = new Text({
       text: 'Game Over!',
       style: {
@@ -28,7 +28,7 @@ export class ResultScene {
     title.y = 100;
     this.container.addChild(title);
 
-    // Scores
+    // scores
     const sortedScores = Object.entries(this.finalScores)
       .sort((a, b) => b[1] - a[1]);
 

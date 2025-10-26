@@ -16,10 +16,10 @@ const io = new Server(httpServer, {
   }
 });
 
-// Serve static files
+// serve static files
 app.use(express.static(path.join(__dirname, '..')));
 
-// Game state
+// game state, implement state machine
 const gameState = {
   players: {},
   currentQuestion: 0,
@@ -28,7 +28,7 @@ const gameState = {
   gameStarted: false
 };
 
-// Sample questions
+// sample questions
 const questions = [
   {
     question: "What is the capital of France?",
@@ -50,14 +50,14 @@ const questions = [
 io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
   
-  // Add player
+  // add player
   gameState.players[socket.id] = {
     id: socket.id,
     score: 0
   };
   gameState.scores[socket.id] = 0;
 
-  // Start game when we have at least 2 players (or after timeout)
+  // start game when we have at least 2 players (or after timeout)
   if (Object.keys(gameState.players).length >= 2 && !gameState.gameStarted) {
     startGame();
   }
@@ -66,17 +66,17 @@ io.on('connection', (socket) => {
     const playerId = socket.id;
     const timestamp = Date.now();
 
-    // Store answer
+    // store answer
     if (!gameState.answers[playerId]) {
       gameState.answers[playerId] = {
         choice: data.choiceIndex,
         timestamp: timestamp
       };
 
-      // Notify all players that someone answered
+      // notify all players that someone answered
       io.emit('playerAnswered', { playerId });
 
-      // Check if all players answered
+      // check if all players answered
       const allAnswered = Object.keys(gameState.players).every(
         pid => gameState.answers[pid]
       );
@@ -103,7 +103,7 @@ function startGame() {
     players: Object.keys(gameState.players) 
   });
 
-  // Send first question after a delay
+  // send first question after a delay
   setTimeout(() => {
     sendNextQuestion();
   }, 2000);
@@ -116,14 +116,14 @@ function sendNextQuestion() {
   }
 
   const question = questions[gameState.currentQuestion];
-  gameState.answers = {}; // Reset answers
+  gameState.answers = {}; // reset answers
 
   io.emit('newQuestion', {
     questionNumber: gameState.currentQuestion + 1,
     totalQuestions: questions.length,
     question: question.question,
     choices: question.choices,
-    correctAnswer: question.correctAnswer // We'll send this for now, hide it later
+    correctAnswer: question.correctAnswer // TODO! sending for now, should be hidden later
   });
 }
 
@@ -131,35 +131,35 @@ function processRoundResults() {
   const question = questions[gameState.currentQuestion];
   const correctAnswer = question.correctAnswer;
 
-  // Calculate scores
+  // calculate scores
   const playerAnswers = Object.entries(gameState.answers);
   const correctPlayers = playerAnswers.filter(([_, ans]) => ans.choice === correctAnswer);
   const allCorrect = correctPlayers.length === playerAnswers.length;
 
-  // Sort by timestamp to find who was first
+  // sort by timestamp to find who was first
   const sortedAnswers = playerAnswers.sort((a, b) => a[1].timestamp - b[1].timestamp);
   const firstCorrectPlayer = sortedAnswers.find(([_, ans]) => ans.choice === correctAnswer)?.[0];
 
-  // Award points
+  // award points
   playerAnswers.forEach(([playerId, answer]) => {
     let points = 0;
     
     if (answer.choice === correctAnswer) {
-      points = 10; // Base points for correct answer
+      points = 10; // base points for correct answer
       
       if (allCorrect) {
-        points += 5; // Bonus if everyone got it right
+        points += 5; // bonus if everyone got it right
       }
       
       if (playerId === firstCorrectPlayer && correctPlayers.length > 1) {
-        points += 5; // Bonus for being first
+        points += 5; // bonus for being first
       }
     }
 
     gameState.scores[playerId] += points;
   });
 
-  // Send results to all players
+  // send results to all players
   Object.keys(gameState.players).forEach(playerId => {
     io.to(playerId).emit('roundResults', {
       playerId: playerId,
@@ -171,17 +171,17 @@ function processRoundResults() {
     });
   });
 
-  // Move to next question
+  // move to next question
   gameState.currentQuestion++;
   setTimeout(() => {
     sendNextQuestion();
-  }, 5000); // Wait 5 seconds before next question
+  }, 5000); // wait 5 seconds before next question
 }
 
 function endGame() {
   io.emit('gameEnd', gameState.scores);
   
-  // Reset game after a delay
+  // reset game after a delay
   setTimeout(() => {
     gameState.gameStarted = false;
     gameState.currentQuestion = 0;

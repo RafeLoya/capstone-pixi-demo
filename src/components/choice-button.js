@@ -9,12 +9,12 @@ export class ChoiceButton {
     this.isDisabled = false;
     this.onClick = onClick;
 
-    // Background
+    // background
     this.bg = new Graphics();
     this.drawBackground('#3498db');
     this.container.addChild(this.bg);
 
-    // Text
+    // text
     this.label = new Text({
       text: text,
       style: {
@@ -28,7 +28,7 @@ export class ChoiceButton {
     this.label.y = height / 2;
     this.container.addChild(this.label);
 
-    // Make interactive
+    // make interactive
     this.container.eventMode = 'static';
     this.container.cursor = 'pointer';
 

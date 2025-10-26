@@ -13,7 +13,7 @@ export class Game {
   }
 
   async start() {
-    // Connect to server
+    // connect to server
     this.socket = io('http://localhost:3000');
     
     this.socket.on('connect', () => {
@@ -31,7 +31,7 @@ export class Game {
     });
 
     this.socket.on('playerAnswered', (data) => {
-      // Visual feedback that another player answered
+      // visual feedback that another player answered
       if (this.currentScene && this.currentScene.onPlayerAnswered) {
         this.currentScene.onPlayerAnswered(data);
       }
@@ -48,7 +48,7 @@ export class Game {
       this.showResultScene(finalScores);
     });
 
-    // Show initial waiting screen
+    // show initial waiting screen
     this.showWaitingScreen();
   }
 
@@ -57,7 +57,7 @@ export class Game {
       this.app.stage.removeChild(this.currentScene.container);
     }
     
-    // Simple waiting text for now
+    // simple waiting text for now
     const waitingText = new Text({
       text: 'Waiting for game to start...',
       style: {
@@ -69,20 +69,6 @@ export class Game {
     waitingText.x = this.app.screen.width / 2;
     waitingText.y = this.app.screen.height / 2;
     this.app.stage.addChild(waitingText);
-    // if (this.currentScene) {
-    //   this.app.stage.removeChild(this.currentScene.container);
-    // }
-    
-    // // Simple waiting text for now
-    // //const { Text } = window.PIXI;
-    // const waitingText = new Text('Waiting for game to start...', {
-    //   fontSize: 32,
-    //   fill: '#ffffff'
-    // });
-    // waitingText.anchor.set(0.5);
-    // waitingText.x = this.app.screen.width / 2;
-    // waitingText.y = this.app.screen.height / 2;
-    // this.app.stage.addChild(waitingText);
   }
 
   showQuizScene(questionData) {
