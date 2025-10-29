@@ -2,6 +2,7 @@ import { io } from 'socket.io-client';
 import { Text } from 'pixi.js'
 import { QuizScene } from './scenes/quiz-scene.js';
 import { ResultScene } from './scenes/result-scene.js';
+import { WaitingScene } from './scenes/waiting-scene.js';
 
 export class Game {
   constructor(app) {
@@ -57,18 +58,9 @@ export class Game {
       this.app.stage.removeChild(this.currentScene.container);
     }
     
-    // simple waiting text for now
-    const waitingText = new Text({
-      text: 'Waiting for game to start...',
-      style: {
-        fontSize: 32,
-        fill: '#ffffff'
-      }
-    });
-    waitingText.anchor.set(0.5);
-    waitingText.x = this.app.screen.width / 2;
-    waitingText.y = this.app.screen.height / 2;
-    this.app.stage.addChild(waitingText);
+    this.currentScene = new WaitingScene(this.app, 'Waiting for game to start...');
+    
+    this.app.stage.addChild(this.currentScene.container);
   }
 
   showQuizScene(questionData) {
