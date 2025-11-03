@@ -74,7 +74,10 @@ io.on('connection', (socket) => {
       };
 
       // notify all players that someone answered
-      io.emit('playerAnswered', { playerId });
+      io.emit('playerAnswered', { 
+        playerId: playerId,
+        choiceIndex: data.choiceIndex
+      });
 
       // check if all players answered
       const allAnswered = Object.keys(gameState.players).every(
