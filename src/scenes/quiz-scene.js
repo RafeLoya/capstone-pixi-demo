@@ -50,8 +50,31 @@ export class QuizScene {
         () => this.selectAnswer(index)
       );
       
+      // hide at first
+      button.container.visible = false;
+      
       this.buttons.push(button);
       this.container.addChild(button.container);
+
+      // container for answer indicators
+      const indicatorContainer = new Container();
+      indicatorContainer.x = screenWidth / 2 + buttonWidth / 2 + 20;
+      indicatorContainer.y = startY + (buttonHeight + spacing) * index + buttonHeight / 2;
+      this.container.addChild(indicatorContainer);
+      this.playerIndicators[index] = { container: indicatorContainer, count: 0 };
+    });
+
+    // reveal choices w/ 10 sec delay
+    this.revealChoices();
+  }
+
+  revealChoices() {
+    const timeoutTime = 10;
+
+    this.buttons.forEach((button, index) => {
+      setTimeout(() => {
+        button.container.visible = true;
+      }, timeoutTime * 1000);
     });
   }
 
@@ -69,9 +92,27 @@ export class QuizScene {
   }
 
   onPlayerAnswered(data) {
-    // show indicator that another player answered
-    // for now, just logging it
-    console.log(`Player ${data.playerId} answered`);
+    // Show indicator that another player answered
+    const choiceIndex = data.choiceIndex;
+    const indicator = this.playerIndicators[choiceIndex];
+    
+    if (!indicator) return;
+
+    // Create a small circle
+    const circle = new Graphics();
+    circle.beginFill(0x4CAF50); // Green color
+    circle.drawCircle(0, 0, 8);
+    circle.endFill();
+    
+    // Position circles in a row
+    const spacing = 20;
+    circle.x = indicator.count * spacing;
+    circle.y = 0;
+    
+    indicator.container.addChild(circle);
+    indicator.count++;
+    
+    console.log(`Player ${data.playerId} answered choice ${choiceIndex}`);
   }
 
   showResults(results) {
