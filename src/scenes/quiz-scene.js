@@ -56,7 +56,7 @@ export class QuizScene {
       this.buttons.push(button);
       this.container.addChild(button.container);
 
-      // container for answer indicators
+      // Create container for player indicators on this choice
       const indicatorContainer = new Container();
       indicatorContainer.x = screenWidth / 2 + buttonWidth / 2 + 20;
       indicatorContainer.y = startY + (buttonHeight + spacing) * index + buttonHeight / 2;
@@ -69,12 +69,10 @@ export class QuizScene {
   }
 
   revealChoices() {
-    const timeoutTime = 10;
-
     this.buttons.forEach((button, index) => {
       setTimeout(() => {
         button.container.visible = true;
-      }, timeoutTime * 1000);
+      }, 10000 + (index * 10000));
     });
   }
 
