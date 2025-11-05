@@ -11,6 +11,7 @@ export class Game {
     this.currentScene = null;
     this.score = 0;
     this.playerId = null;
+    this.players = [];
   }
 
   async start() {
@@ -24,10 +25,14 @@ export class Game {
 
     this.socket.on('gameStart', (data) => {
       console.log('Game starting with players:', data.players);
+      this.players = data.players;
       this.showWaitingScreen();
     });
 
     this.socket.on('newQuestion', (questionData) => {
+      if (this.currentScene && this.currentScene.resetStickFigures) {
+        this.currentScene.resetStickFigures();
+      }
       this.showQuizScene(questionData);
     });
 
@@ -68,9 +73,15 @@ export class Game {
       this.app.stage.removeChild(this.currentScene.container);
     }
 
-    this.currentScene = new QuizScene(this.app, questionData, (choiceIndex) => {
-      this.submitAnswer(choiceIndex);
-    });
+    this.currentScene = new QuizScene(
+      this.app, 
+      questionData, 
+      (choiceIndex) => {
+        this.submitAnswer(choiceIndex);
+      },
+      this.players,
+      this.playerId
+    );
     
     this.app.stage.addChild(this.currentScene.container);
   }
