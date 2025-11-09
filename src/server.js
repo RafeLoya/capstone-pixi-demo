@@ -3,6 +3,11 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  saveGameSession,
+  saveGameResults
+} from './services/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +26,8 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // game state, implement state machine
 const gameState = {
+  sessionId: null, // unique session ID for database
+  sessionStartTime: null,
   players: {},
   currentQuestion: 0,
   answers: {},
@@ -101,9 +108,14 @@ io.on('connection', (socket) => {
 function startGame() {
   gameState.gameStarted = true;
   gameState.currentQuestion = 0;
-  
-  io.emit('gameStart', { 
-    players: Object.keys(gameState.players) 
+  gameState.sessionId = uuidv4(); // generate unique session ID
+  gameState.sessionStartTime = new Date().toISOString();
+
+  console.log(`Starting game session: ${gameState.sessionId}`);
+
+  io.emit('gameStart', {
+    players: Object.keys(gameState.players),
+    sessionId: gameState.sessionId
   });
 
   // send first question after a delay
@@ -125,8 +137,7 @@ function sendNextQuestion() {
     questionNumber: gameState.currentQuestion + 1,
     totalQuestions: questions.length,
     question: question.question,
-    choices: question.choices,
-    correctAnswer: question.correctAnswer // TODO! sending for now, should be hidden later
+    choices: question.choices
   });
 }
 
@@ -181,14 +192,39 @@ function processRoundResults() {
   }, 5000); // wait 5 seconds before next question
 }
 
-function endGame() {
+async function endGame() {
   io.emit('gameEnd', gameState.scores);
-  
+
+  // Save game data to DynamoDB
+  try {
+    console.log('Saving game session to database...');
+
+    // Save session metadata
+    await saveGameSession({
+      sessionId: gameState.sessionId,
+      startTime: gameState.sessionStartTime,
+      endTime: new Date().toISOString(),
+      playerIds: Object.keys(gameState.players),
+      questionCount: questions.length,
+      status: 'completed'
+    });
+
+    // Save final scores and rankings
+    await saveGameResults(gameState.sessionId, gameState.scores);
+
+    console.log(`Game session ${gameState.sessionId} saved successfully!`);
+  } catch (error) {
+    console.error('Error saving game session to database:', error);
+    // Continue with game reset even if database save fails
+  }
+
   // reset game after a delay
   setTimeout(() => {
     gameState.gameStarted = false;
     gameState.currentQuestion = 0;
     gameState.answers = {};
+    gameState.sessionId = null;
+    gameState.sessionStartTime = null;
     Object.keys(gameState.scores).forEach(pid => {
       gameState.scores[pid] = 0;
     });

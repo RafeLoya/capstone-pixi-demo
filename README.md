@@ -45,8 +45,85 @@ npm start
 
 ## Next Steps
 
-- Add question timer
-- Show other players' answer indicators in real-time
 - Add more visual feedback and animations
 - Create proper lobby system
 - Add more questions or question API
+
+## Architecture
+
+This project uses a **hybrid architecture**:
+
+- **Game Server** (Node.js + Socket.io): Handles real-time multiplayer gameplay
+- **Serverless APIs** (AWS Lambda + DynamoDB): Provides read-only dashboard data
+- **Dashboard** (GitHub Pages): Static site for viewing leaderboards and exporting data
+
+### Why Hybrid?
+
+- Real-time gameplay requires persistent WebSocket connections (game server)
+- Data querying/export works great with serverless (always available, pay-per-use)
+- Best of both worlds: performance + scalability
+
+## Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
+
+**Quick Start**:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Deploy serverless infrastructure
+npm run deploy:dev
+
+# 3. Configure environment
+# Edit .env with your AWS credentials
+
+# 4. Start game server
+npm start
+
+# 5. Deploy dashboard to GitHub Pages
+# (Settings → Pages → Deploy from /dashboard folder)
+```
+
+## Required `.env` Variables
+
+```ini
+# AWS configuration
+AWS_REGION=us-east-1
+STAGE=dev
+SERVICE_NAME=quiz-game-api
+
+# AWS credentials
+# REQUIRED FOR DB WRITES
+# obtained from AWS IAM console
+AWS_ACCESS_KEY_ID=▓▓▓▓▓▓▓▓▓▓
+AWS_SECRET_ACCESS_KEY=▓▓▓▓▓▓▓▓▓▓
+
+# optional: game server configuration
+PORT=3000
+```
+
+## Dashboard
+
+Once deployed, the dashboard provides:
+- Global leaderboards (all players)
+- Session-by-session results
+- Overall statistics (total games, avg scores, etc.)
+- CSV export for recruiters
+
+## Quick Demo
+
+Want to demo with 4 players on local network? See **[DEMO_GUIDE.md](./docs/DEMO_GUIDE.md)** for:
+- Step-by-step setup (5 minutes)
+- Host configuration
+- Connecting other devices
+- Troubleshooting tips
+- Demo presentation script
+
+**Quick Start for Demo:**
+```bash
+npm install
+npm start
+# Other devices connect to http://[YOUR_IP]:3000
+```

@@ -90,3 +90,9 @@ Thumbs.db
 
 # Other
 *.zip
+.env
+.env.local
+env.*.local
+CLAUDE.md
+CLAUDE_DOCS/
+.serverless/
