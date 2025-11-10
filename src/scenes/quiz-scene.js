@@ -55,9 +55,9 @@ export class QuizScene {
 
 
     const buttonWidth = (screenWidth / 2) - 40; // Half screen minus spacing
-    const buttonHeight = (screenHeight / 2) - 120; // Half screen minus spacing
+    const buttonHeight = Math.min((screenHeight - 280) / 2 - 20, 150); // Constrain height
     const spacing = 20;
-    const startY = screenHeight / 2 - 30;
+    const startY = 280; // Fixed position below stick figures
 
     const positions = [
       { x: spacing, y: startY }, // Top-left (0)
