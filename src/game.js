@@ -36,6 +36,13 @@ export class Game {
       this.showQuizScene(questionData);
     });
 
+    this.socket.on('answerPeriodStart', () => {
+      // start 30-second answer timer
+      if (this.currentScene && this.currentScene.startAnswerPeriod) {
+        this.currentScene.startAnswerPeriod();
+      }
+    });
+
     this.socket.on('playerAnswered', (data) => {
       // visual feedback that another player answered
       if (this.currentScene && this.currentScene.onPlayerAnswered) {
@@ -60,6 +67,9 @@ export class Game {
 
   showWaitingScreen() {
     if (this.currentScene) {
+      if (this.currentScene.destroy) {
+        this.currentScene.destroy();
+      }
       this.app.stage.removeChild(this.currentScene.container);
     }
     
@@ -70,6 +80,9 @@ export class Game {
 
   showQuizScene(questionData) {
     if (this.currentScene) {
+      if (this.currentScene.destroy) {
+        this.currentScene.destroy();
+      }
       this.app.stage.removeChild(this.currentScene.container);
     }
 
@@ -88,6 +101,9 @@ export class Game {
 
   showResultScene(finalScores) {
     if (this.currentScene) {
+      if (this.currentScene.destroy) {
+        this.currentScene.destroy();
+      }
       this.app.stage.removeChild(this.currentScene.container);
     }
 

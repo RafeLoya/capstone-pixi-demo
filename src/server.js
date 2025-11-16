@@ -25,7 +25,8 @@ const gameState = {
   currentQuestion: 0,
   answers: {},
   scores: {},
-  gameStarted: false
+  gameStarted: false,
+  roundTimer: null
 };
 
 // sample questions
@@ -85,6 +86,11 @@ io.on('connection', (socket) => {
       );
 
       if (allAnswered) {
+        // clear the timer and process results immediately
+        if (gameState.roundTimer) {
+          clearTimeout(gameState.roundTimer);
+          gameState.roundTimer = null;
+        }
         processRoundResults();
       }
     }
@@ -128,9 +134,29 @@ function sendNextQuestion() {
     choices: question.choices,
     correctAnswer: question.correctAnswer // TODO! sending for now, should be hidden later
   });
+
+  // start 30-second timer after all choices are revealed (4 choices × 10 seconds = 40 seconds)
+  const revealTime = 40000; // 40 seconds for all 4 choices to reveal
+  const answerTime = 30000; // 30 seconds to answer
+  
+  setTimeout(() => {
+    // notify clients that answer period has started
+    io.emit('answerPeriodStart');
+    
+    // set timer to auto-process results after 30 seconds
+    gameState.roundTimer = setTimeout(() => {
+      processRoundResults();
+    }, answerTime);
+  }, revealTime);
 }
 
 function processRoundResults() {
+  // clear timer if it exists
+  if (gameState.roundTimer) {
+    clearTimeout(gameState.roundTimer);
+    gameState.roundTimer = null;
+  }
+
   const question = questions[gameState.currentQuestion];
   const correctAnswer = question.correctAnswer;
 

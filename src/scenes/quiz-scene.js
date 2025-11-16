@@ -17,6 +17,7 @@ export class QuizScene {
     this.stickFigures = {};
     this.players = players;
     this.currentPlayerId = currentPlayerId;
+    this.answerPeriodActive = false;
 
     this.build();
   }
@@ -132,17 +133,22 @@ export class QuizScene {
 
     // draw progress circle
     this.timerGraphics.clear();
-    const progress = seconds / 10;
+    const maxTime = this.answerPeriodActive ? 30 : 10;
+    const progress = seconds / maxTime;
     const startAngle = -Math.PI / 2;
     const endAngle = startAngle + (Math.PI * 2 * progress);
 
-    this.timerGraphics.beginFill(0x3498db, 0.3);
+    // Change color to red when in answer period and time is running low
+    const fillColor = this.answerPeriodActive && seconds <= 10 ? 0xe74c3c : 0x3498db;
+    const lineColor = this.answerPeriodActive && seconds <= 10 ? 0xe74c3c : 0x3498db;
+
+    this.timerGraphics.beginFill(fillColor, 0.3);
     this.timerGraphics.moveTo(0, 0);
     this.timerGraphics.arc(0, 0, 35, startAngle, endAngle);
     this.timerGraphics.lineTo(0, 0);
     this.timerGraphics.endFill();
 
-    this.timerGraphics.lineStyle(3, 0x3498db);
+    this.timerGraphics.lineStyle(3, lineColor);
     this.timerGraphics.arc(0, 0, 35, startAngle, endAngle);
   }
 
@@ -157,10 +163,6 @@ export class QuizScene {
         // start timer for next button if there are more to reveal
         if (revealedCount < this.buttons.length) {
           this.startCountdown(10);
-        } else {
-          // hide timer when all buttons are revealed
-          if (this.timerText) this.timerText.visible = false;
-          if (this.timerGraphics) this.timerGraphics.visible = false;
         }
       }, index * 10000);
     });
@@ -169,6 +171,14 @@ export class QuizScene {
     if (this.buttons.length > 0) {
       this.startCountdown(10);
     }
+  }
+
+  startAnswerPeriod() {
+    this.answerPeriodActive = true;
+    this.startCountdown(30);
+    
+    if (this.timerText) this.timerText.visible = true;
+    if (this.timerGraphics) this.timerGraphics.visible = true;
   }
 
   startCountdown(duration) {
@@ -185,7 +195,6 @@ export class QuizScene {
         this.updateTimerDisplay(this.currentTimer);
       } else {
         clearInterval(this.countdownInterval);
-        this.currentTimer = duration; // Reset for next round
       }
     }, 1000);
   }
@@ -291,6 +300,11 @@ export class QuizScene {
   }
 
   showResults(results) {
+    // clean up timer
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+
     // show correct answer
     const correctIndex = this.questionData.correctAnswer;
     
@@ -328,5 +342,11 @@ export class QuizScene {
     scoreText.x = 20;
     scoreText.y = 20;
     this.container.addChild(scoreText);
+  }
+
+  destroy() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
   }
 }
